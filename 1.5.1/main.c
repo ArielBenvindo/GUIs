@@ -1,3 +1,5 @@
+//Consertado, usa agora só o SDL_WaitEventTimeout
+
 #include <SDL.h>
 #include <stdio.h>
 
@@ -12,13 +14,8 @@ int main (int argc, char* args[])
                       );
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
 
-    /* Retângulo que se move com o tempo */
     SDL_Rect rectTempo = { 20, 20, 20, 20 };
-
-    /* Retângulo que se move com o teclado */
     SDL_Rect rectTeclado = { 100, 50, 20, 20 };
-
-    /* Retângulo que segue o mouse */
     SDL_Rect rectMouse = { 200, 100, 20, 20 };
 
     /* EXECUÇÃO */
@@ -26,29 +23,10 @@ int main (int argc, char* args[])
     int running = 1;
 
     while (running) {
-        /* Cor de fundo */
-        SDL_SetRenderDrawColor(ren, 255,255,255,255);
-        SDL_RenderClear(ren);
-
-        /* Atualiza posição do retângulo do tempo */
-        rectTempo.x += 1;
-        if (rectTempo.x > 400) rectTempo.x = -rectTempo.w; // reaparece da esquerda
-
-        /* Desenha retângulos */
-        SDL_SetRenderDrawColor(ren, 255,0,0,255); // vermelho
-        SDL_RenderFillRect(ren, &rectTempo);
-
-        SDL_SetRenderDrawColor(ren, 0,255,0,255); // verde
-        SDL_RenderFillRect(ren, &rectTeclado);
-
-        SDL_SetRenderDrawColor(ren, 0,0,255,255); // azul
-        SDL_RenderFillRect(ren, &rectMouse);
-
-        SDL_RenderPresent(ren);
-
-        /* Processa eventos */
-        while (SDL_PollEvent(&evt)) {
-            if (evt.type == SDL_QUIT) running = 0;
+        if (SDL_WaitEventTimeout(&evt, 16)) {
+            if (evt.type == SDL_QUIT) {
+                running = 0;
+            }
 
             if (evt.type == SDL_KEYDOWN) {
                 switch (evt.key.keysym.sym) {
@@ -65,7 +43,22 @@ int main (int argc, char* args[])
             }
         }
 
-        SDL_Delay(16); // ~60 FPS
+        rectTempo.x += 1;
+        if (rectTempo.x > 400) rectTempo.x = -rectTempo.w;
+
+        SDL_SetRenderDrawColor(ren, 255,255,255,255);
+        SDL_RenderClear(ren);
+
+        SDL_SetRenderDrawColor(ren, 255,0,0,255);
+        SDL_RenderFillRect(ren, &rectTempo);
+
+        SDL_SetRenderDrawColor(ren, 0,255,0,255);
+        SDL_RenderFillRect(ren, &rectTeclado);
+
+        SDL_SetRenderDrawColor(ren, 0,0,255,255);
+        SDL_RenderFillRect(ren, &rectMouse);
+
+        SDL_RenderPresent(ren);
     }
 
     /* FINALIZAÇÃO */

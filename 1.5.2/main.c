@@ -2,23 +2,25 @@
 #include <stdio.h>
 
 
-int AUX_WaitEventTimeoutCount(SDL_Event* evt, Uint32* ms) {
+// Função auxiliar
+int AUX_WaitEventTimeout(SDL_Event* evt, Uint32* ms) {
     if (*ms == 0) {
-        return SDL_PollEvent(evt);
+        return 0;
     }
 
     Uint32 inicio = SDL_GetTicks();
-    int result = SDL_WaitEventTimeout(evt, *ms);
-    Uint32 fim = SDL_GetTicks();
 
+    int ret = SDL_WaitEventTimeout(evt, *ms);
+
+    Uint32 fim = SDL_GetTicks();
     Uint32 decorrido = fim - inicio;
+
     if (decorrido >= *ms) {
         *ms = 0;
     } else {
         *ms -= decorrido;
     }
-
-    return result;
+    return ret;
 }
 
 int main (int argc, char* args[])
@@ -31,16 +33,13 @@ int main (int argc, char* args[])
                       );
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
 
-   
     SDL_Rect rectTempo = { 20, 20, 20, 20 };
     double posTempoX = rectTempo.x;
-    const double velocidade = 10.0;
+    const double velocidade = 100.0;
 
     SDL_Rect rectTeclado = { 100, 50, 20, 20 };
+    SDL_Rect rectMouse   = { 200, 100, 20, 20 };
 
-    SDL_Rect rectMouse = { 200, 100, 20, 20 };
-
-    /* EXECUÇÃO */
     SDL_Event evt;
     int running = 1;
     Uint32 lastTick = SDL_GetTicks();
@@ -50,16 +49,13 @@ int main (int argc, char* args[])
         Uint32 delta = now - lastTick;
         lastTick = now;
 
-        
         posTempoX += velocidade * (delta / 1000.0);
         if (posTempoX > 400) posTempoX = -rectTempo.w;
         rectTempo.x = (int)posTempoX;
 
-       
         SDL_SetRenderDrawColor(ren, 255,255,255,255);
         SDL_RenderClear(ren);
 
-        
         SDL_SetRenderDrawColor(ren, 255,0,0,255);
         SDL_RenderFillRect(ren, &rectTempo);
 
@@ -71,9 +67,8 @@ int main (int argc, char* args[])
 
         SDL_RenderPresent(ren);
 
-       
         Uint32 ms = 16;
-        while (AUX_WaitEventTimeoutCount(&evt, &ms)) {
+        while (AUX_WaitEventTimeout(&evt, &ms)) {
             if (evt.type == SDL_QUIT) running = 0;
 
             if (evt.type == SDL_KEYDOWN) {

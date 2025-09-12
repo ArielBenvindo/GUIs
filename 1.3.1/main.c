@@ -1,3 +1,4 @@
+//Consertado
 #include <SDL.h>
 
 int main(int argc, char* args[])
@@ -11,32 +12,28 @@ int main(int argc, char* args[])
                                        SDL_WINDOW_SHOWN);
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
-    /* VARIÁVEIS DO QUADRADO */
-    SDL_Rect r = {40, 20, 20, 20};  // posição inicial
-    int phase = 0;                  // controla direção
-    int runs = 0;                   // quantas voltas completas
+    SDL_Rect r = {40, 20, 20, 20}; 
+    int phase = 0;               
+    int runs = 0;        
 
-    /* LOOP PRINCIPAL */
     SDL_Event event;
     int running = 1;
+    
     while (running) {
-        /* TRATA EVENTOS */
-        while (SDL_PollEvent(&event)) {
+
+        if (SDL_WaitEventTimeout(&event, 16)) {
             if (event.type == SDL_QUIT) running = 0;
         }
 
-        /* LIMPAR TELA */
-        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // branco
+        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
         SDL_RenderClear(ren);
 
-        /* DESENHAR QUADRADO */
-        SDL_SetRenderDrawColor(ren, 0, 0, 255, 255); // azul
+
+        SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
         SDL_RenderFillRect(ren, &r);
 
         SDL_RenderPresent(ren);
-        SDL_Delay(16); // ~60 FPS
 
-        /* LÓGICA DO MOVIMENTO */
         if (r.x < 300 && phase == 0) {
             r.x += 2;
         } else if (phase == 0) {
@@ -54,7 +51,7 @@ int main(int argc, char* args[])
         } else if (phase == 3) {
             phase = 0;
             runs++;
-            if (runs >= 2) running = 0; // para depois de 2 voltas
+            if (runs >= 2) running = 0;
         }
     }
 
